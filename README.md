@@ -3,7 +3,7 @@
 `Crown of Ash` is a custom random map for **Age of Empires II: Definitive
 Edition**, designed by betwixtX with OpenAI Codex.
 
-[Download Crown of Ash v1.0.2 compatibility build](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
+[Download Crown of Ash v1.0.2](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
 
 Each player begins in a balanced clearing inside dense pine forest. A guaranteed
 road leads from every base to a raised central Crown containing ten gold mines,
@@ -78,12 +78,13 @@ Static validation cannot execute the proprietary AoE2 DE map generator. Before
 publishing, generate several seeds for Tiny, Medium, and Large sizes in the
 in-game Scenario Editor and play one Random Map and one Regicide smoke match.
 
-Version 1.0.2 is a conservative compatibility build made after crashes in
-Skirmish and Scenario Editor test mode. It removes the Monument object, all
-guardian units, modified resource state, special Gaia ownership flags, and
-animated decorations. Version 1.0.1 had already removed the Crown's continuously
-evaluated `guard_state` resource trickle. The generated layout and standard
-central treasure remain intact.
+Version 1.0.2 is the runtime-compatible release made after crashes in Skirmish
+and Scenario Editor test mode. It removes the Monument object, all guardian
+units, modified resource state, special Gaia ownership flags, and animated
+decorations. Version 1.0.1 had already removed the Crown's continuously evaluated
+`guard_state` resource trickle. The generated layout and standard central
+treasure remain intact. An in-engine GeForce NOW test no longer reproduced the
+previous crash.
 
 ## Modern DE features
 
