@@ -1,0 +1,59 @@
+CROWN OF ASH MONUMENT ISOLATION
+================================
+
+T01 proved that restoring only the passive Monument placement crashes the
+current AoE2 DE runtime. These M-tests split that placement into individual
+variables and test an Outpost replacement.
+
+INSTALL
+-------
+
+Copy the individual M-test .rms files into:
+
+%USERPROFILE%\Games\Age of Empires 2 DE\<player-id>\resources\_common\random-map-scripts\
+
+Fully restart Age of Empires II: Definitive Edition. No PNG files are needed.
+
+TEST ORDER
+----------
+
+Use Scenario Editor, generate the named map, press Test, move a unit, and wait
+at least two minutes before recording PASS.
+
+M01 Outpost Same Placement
+    Ordinary building control with every placement attribute used by failed T01.
+    PASS means the placement recipe itself is valid.
+
+M02 Bare Symbolic Monument
+    Uses only: create_object MONUMENT
+    CRASH after an M01 PASS identifies the Monument object itself.
+
+M03 Monument Crown Land
+    Adds place_on_specific_land_id.
+
+M04 Monument Crown Land Gaia
+    Adds set_gaia_object_only.
+
+M05 Monument Crown Land Gaia Ignore
+    Adds ignore_terrain_restrictions.
+
+M06 Monument Full Placement
+    Adds find_closest_to_map_center and is symbolically equivalent to T01.
+
+M07 Capturable Outpost Substitute
+    Uses the M01 Outpost plus set_building_capturable and make_indestructible.
+    PASS confirms a replacement can preserve the Crown control-point mechanic.
+
+RESULTS
+-------
+
+M01 Outpost Same Placement:          EDITOR _____  SKIRMISH _____
+M02 Bare Symbolic Monument:          EDITOR _____  SKIRMISH _____
+M03 Monument Crown Land:             EDITOR _____  SKIRMISH _____
+M04 Monument Crown Land Gaia:        EDITOR _____  SKIRMISH _____
+M05 Monument Crown Land Gaia Ignore: EDITOR _____  SKIRMISH _____
+M06 Monument Full Placement:         EDITOR _____  SKIRMISH _____
+M07 Capturable Outpost Substitute:   EDITOR _____  SKIRMISH _____
+
+Stop after the first Monument crash and report the M-number. Test M07 even if a
+Monument test crashes, because it is the candidate replacement for the final map.

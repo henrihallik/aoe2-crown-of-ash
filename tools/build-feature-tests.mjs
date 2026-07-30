@@ -21,11 +21,18 @@ const baselinePath = join(
   "random-map-scripts",
   "Crown of Ash.rms",
 );
-const outputDir = join(root, "diagnostics", "generated");
-const instructionsPath = join(
+const featureOutputDir = join(root, "diagnostics", "generated");
+const monumentOutputDir = join(root, "diagnostics", "generated-monument");
+const featureInstructionsPath = join(
   root,
   "diagnostics",
   "feature-isolation",
+  "TEST-INSTRUCTIONS.txt",
+);
+const monumentInstructionsPath = join(
+  root,
+  "diagnostics",
+  "monument-isolation",
   "TEST-INSTRUCTIONS.txt",
 );
 
@@ -77,6 +84,26 @@ ${attributeLines}    ignore_terrain_restrictions
 }`;
   result = insertBefore(result, CENTER_MARKER, block);
   return result;
+}
+
+function addSymbolicCenterBuilding(source, objectName, attributes = [], bare = false) {
+  if (bare) {
+    return insertBefore(
+      source,
+      CENTER_MARKER,
+      `/* Diagnostic feature: bare symbolic ${objectName}. */
+create_object ${objectName}`,
+    );
+  }
+
+  const attributeLines = attributes.map((attribute) => `    ${attribute}\n`).join("");
+  return insertBefore(
+    source,
+    CENTER_MARKER,
+    `/* Diagnostic feature: symbolic ${objectName} building. */
+create_object ${objectName} {
+${attributeLines}}`,
+  );
 }
 
 function addResourceDelta(source) {
@@ -346,36 +373,149 @@ const featurePatterns = {
   guardState: /\bguard_state\b/g,
 };
 
-mkdirSync(outputDir, { recursive: true });
-const expectedFiles = [];
+const monumentVariants = [
+  {
+    id: "M01",
+    title: "Outpost Same Placement",
+    build: (source) =>
+      addSymbolicCenterBuilding(source, "OUTPOST", [
+        "place_on_specific_land_id CROWN_LAND_ID",
+        "set_gaia_object_only",
+        "ignore_terrain_restrictions",
+        "find_closest_to_map_center",
+      ]),
+    expected: { outpost: 1, ignoreTerrain: 1 },
+  },
+  {
+    id: "M02",
+    title: "Bare Symbolic Monument",
+    build: (source) => addSymbolicCenterBuilding(source, "MONUMENT", [], true),
+    expected: { monument: 1 },
+  },
+  {
+    id: "M03",
+    title: "Monument Crown Land",
+    build: (source) =>
+      addSymbolicCenterBuilding(source, "MONUMENT", [
+        "place_on_specific_land_id CROWN_LAND_ID",
+      ]),
+    expected: { monument: 1 },
+  },
+  {
+    id: "M04",
+    title: "Monument Crown Land Gaia",
+    build: (source) =>
+      addSymbolicCenterBuilding(source, "MONUMENT", [
+        "place_on_specific_land_id CROWN_LAND_ID",
+        "set_gaia_object_only",
+      ]),
+    expected: { monument: 1 },
+  },
+  {
+    id: "M05",
+    title: "Monument Crown Land Gaia Ignore",
+    build: (source) =>
+      addSymbolicCenterBuilding(source, "MONUMENT", [
+        "place_on_specific_land_id CROWN_LAND_ID",
+        "set_gaia_object_only",
+        "ignore_terrain_restrictions",
+      ]),
+    expected: { monument: 1, ignoreTerrain: 1 },
+  },
+  {
+    id: "M06",
+    title: "Monument Full Placement",
+    build: (source) =>
+      addSymbolicCenterBuilding(source, "MONUMENT", [
+        "place_on_specific_land_id CROWN_LAND_ID",
+        "set_gaia_object_only",
+        "ignore_terrain_restrictions",
+        "find_closest_to_map_center",
+      ]),
+    expected: { monument: 1, ignoreTerrain: 1 },
+  },
+  {
+    id: "M07",
+    title: "Capturable Outpost Substitute",
+    build: (source) =>
+      addSymbolicCenterBuilding(source, "OUTPOST", [
+        "place_on_specific_land_id CROWN_LAND_ID",
+        "set_gaia_object_only",
+        "set_building_capturable",
+        "make_indestructible",
+        "ignore_terrain_restrictions",
+        "find_closest_to_map_center",
+      ]),
+    expected: {
+      outpost: 1,
+      capturable: 1,
+      indestructible: 1,
+      ignoreTerrain: 1,
+    },
+  },
+];
 
-for (const variant of variants) {
-  const fileName = `Crown Ash ${variant.id} ${variant.title}.rms`;
-  const outputPath = join(outputDir, fileName);
-  const source = diagnosticHeader(variant.build(baseline), variant.id, variant.title);
-  assert.notEqual(source, baseline, `${variant.id} did not change the baseline`);
-  for (const [feature, pattern] of Object.entries(featurePatterns)) {
-    const actualCount = [...source.matchAll(pattern)].length;
-    const expectedCount = variant.expected[feature] ?? 0;
-    assert.equal(
-      actualCount,
-      expectedCount,
-      `${variant.id} ${feature}: expected ${expectedCount}, found ${actualCount}`,
-    );
+const monumentPatterns = {
+  monument: /\bcreate_object\s+MONUMENT\b/g,
+  outpost: /\bcreate_object\s+OUTPOST\b/g,
+  capturable: /\bset_building_capturable\b/g,
+  indestructible: /\bmake_indestructible\b/g,
+  ignoreTerrain: /\bignore_terrain_restrictions\b/g,
+};
+
+function buildVariantSet({
+  variantSet,
+  patterns,
+  outputDir,
+  instructionsPath,
+  label,
+}) {
+  mkdirSync(outputDir, { recursive: true });
+  const expectedFiles = [];
+
+  for (const variant of variantSet) {
+    const fileName = `Crown Ash ${variant.id} ${variant.title}.rms`;
+    const outputPath = join(outputDir, fileName);
+    const source = diagnosticHeader(variant.build(baseline), variant.id, variant.title);
+    assert.notEqual(source, baseline, `${variant.id} did not change the baseline`);
+    for (const [feature, pattern] of Object.entries(patterns)) {
+      const actualCount = [...source.matchAll(pattern)].length;
+      const expectedCount = variant.expected[feature] ?? 0;
+      assert.equal(
+        actualCount,
+        expectedCount,
+        `${variant.id} ${feature}: expected ${expectedCount}, found ${actualCount}`,
+      );
+    }
+    writeFileSync(outputPath, source);
+    expectedFiles.push(fileName);
+    console.log(`Built ${outputPath}`);
   }
-  writeFileSync(outputPath, source);
-  expectedFiles.push(fileName);
-  console.log(`Built ${outputPath}`);
+
+  copyFileSync(instructionsPath, join(outputDir, "TEST-INSTRUCTIONS.txt"));
+  expectedFiles.push("TEST-INSTRUCTIONS.txt");
+
+  const actualFiles = readdirSync(outputDir).sort();
+  assert.deepEqual(
+    actualFiles,
+    expectedFiles.sort(),
+    `${outputDir} contains stale or missing files`,
+  );
+
+  console.log(`PASS ${variantSet.length} ${label} variants`);
 }
 
-copyFileSync(instructionsPath, join(outputDir, "TEST-INSTRUCTIONS.txt"));
-expectedFiles.push("TEST-INSTRUCTIONS.txt");
-
-const actualFiles = readdirSync(outputDir).sort();
-assert.deepEqual(
-  actualFiles,
-  expectedFiles.sort(),
-  "diagnostics/generated contains stale or missing files",
-);
-
-console.log(`PASS ${variants.length} isolated feature variants`);
+buildVariantSet({
+  variantSet: variants,
+  patterns: featurePatterns,
+  outputDir: featureOutputDir,
+  instructionsPath: featureInstructionsPath,
+  label: "isolated feature",
+});
+buildVariantSet({
+  variantSet: monumentVariants,
+  patterns: monumentPatterns,
+  outputDir: monumentOutputDir,
+  instructionsPath: monumentInstructionsPath,
+  label: "Monument isolation",
+});
