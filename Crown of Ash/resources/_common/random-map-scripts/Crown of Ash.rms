@@ -1,6 +1,6 @@
 /* Compatibility: Definitive Edition */
 /*
-    Crown of Ash v1.0.2
+    Crown of Ash v1.1.0-rc1
     Designed for Age of Empires II: Definitive Edition.
 
     Recommended:
@@ -13,7 +13,8 @@
       - Every player starts in a resource-balanced forest clearing.
       - Each clearing has a guaranteed road to the raised central Crown.
       - Team games also receive narrow roads between allied clearings.
-      - Rich central mines and relics create a decisive shared objective.
+      - The capturable Crown grants 24 gold per minute.
+      - Rich central mines are protected by hostile neutral wardens.
       - Four unconnected ash caches hide randomized bonus resources.
 
     This script intentionally targets Update 153015 or newer. It uses the
@@ -32,12 +33,19 @@
 #const FLOWER_GROUND 122
 
 /* Classic and DE object aliases */
+#const CROWN_MONUMENT 826
+#const WARDEN_WOLF 126
+#const WARDEN_DIRE_WOLF 89
+#const WARDEN_JAGUAR 812
 #const START_SHEEP 594
 #const START_TURKEY 833
 #const START_PINE 350
 #const CACHE_BERRIES 59
 #const CACHE_GOLD 66
 #const CACHE_STONE 102
+#const CENTER_BONFIRE 304
+#const CENTER_CRACKS 241
+#const CENTER_SKELETON 710
 
 /* Stable identifiers used by placement constraints. */
 #const CROWN_LAND_ID 200
@@ -46,12 +54,18 @@
 #const CACHE_LAND_C 303
 #const CACHE_LAND_D 304
 #const REGICIDE_CASTLE_AREA 1200
+#const CROWN_MONUMENT_AREA 9001
+#const CROWN_TREASURE_AREA 9002
 
 <PLAYER_SETUP>
 
 random_placement
 behavior_version 2
 ai_info_map_type BLACK_FOREST 0 0 0
+
+/* Flag 2 activates ResourceDelta / 100 per second while the Crown is held. */
+guard_state CROWN_MONUMENT AMOUNT_GOLD 40 2
+
 
 <LAND_GENERATION>
 
@@ -181,6 +195,14 @@ create_land {
 }
 
 
+<ELEVATION_GENERATION>
+
+/*
+    This stage is required whenever a generated land uses base_elevation, even
+    when no additional elevation patches are needed.
+*/
+
+
 <TERRAIN_GENERATION>
 
 /* Small flowered patches add readable visual texture away from each TC. */
@@ -228,12 +250,18 @@ create_connect_land_zones 1 2 {
 <OBJECTS_GENERATION>
 
 /*
-    Object groups were added in Update 153015. Starting food stays equivalent,
-    while contested cache rewards are allowed to vary.
+    Object groups were added in Update 153015. Starting food stays equivalent;
+    neutral rewards and wardens are allowed to vary because they are contested.
 */
 create_object_group START_HERDABLE {
     add_object START_SHEEP 50
     add_object START_TURKEY 50
+}
+
+create_object_group CROWN_WARDEN {
+    add_object WARDEN_WOLF 55
+    add_object WARDEN_JAGUAR 30
+    add_object WARDEN_DIRE_WOLF 15
 }
 
 create_object_group CACHE_TREASURE {
@@ -460,6 +488,21 @@ else
     }
 endif
 
+/*
+    The Crown is always neutral, capturable, and indestructible. Holding it
+    activates the guard_state gold trickle configured in PLAYER_SETUP.
+*/
+create_object CROWN_MONUMENT {
+    place_on_specific_land_id CROWN_LAND_ID
+    set_gaia_object_only
+    set_building_capturable
+    make_indestructible
+    ignore_terrain_restrictions
+    find_closest_to_map_center
+    actor_area CROWN_MONUMENT_AREA
+    actor_area_radius 5
+}
+
 /* Central mines: valuable enough to matter, exposed enough to contest. */
 create_object GOLD {
     number_of_objects 10
@@ -469,7 +512,11 @@ create_object GOLD {
     set_gaia_object_only
     place_on_specific_land_id CROWN_LAND_ID
     find_closest_to_map_center
+    resource_delta 200
     temp_min_distance_group_placement 2
+    avoid_actor_area CROWN_MONUMENT_AREA
+    actor_area CROWN_TREASURE_AREA
+    actor_area_radius 12
 }
 
 create_object STONE {
@@ -479,7 +526,9 @@ create_object STONE {
     set_loose_grouping
     set_gaia_object_only
     place_on_specific_land_id CROWN_LAND_ID
+    resource_delta 150
     temp_min_distance_group_placement 2
+    avoid_actor_area CROWN_MONUMENT_AREA
 }
 
 create_object RELIC {
@@ -487,6 +536,16 @@ create_object RELIC {
     set_gaia_object_only
     place_on_specific_land_id CROWN_LAND_ID
     temp_min_distance_group_placement 6
+    avoid_actor_area CROWN_MONUMENT_AREA
+}
+
+create_object CROWN_WARDEN {
+    number_of_objects 7
+    set_gaia_object_only
+    set_gaia_unconvertible
+    actor_area_to_place_in CROWN_TREASURE_AREA
+    temp_min_distance_group_placement 2
+    avoid_actor_area CROWN_MONUMENT_AREA
 }
 
 /* Four mixed treasure clusters reward exploration beyond the main roads. */
@@ -498,4 +557,38 @@ create_object CACHE_TREASURE {
     set_gaia_object_only
     terrain_to_place_on CACHE_GROUND
     temp_min_distance_group_placement 16
+}
+
+create_object CROWN_WARDEN {
+    number_of_objects 1
+    number_of_groups 4
+    set_gaia_object_only
+    set_gaia_unconvertible
+    terrain_to_place_on CACHE_GROUND
+    temp_min_distance_group_placement 16
+}
+
+/* Sparse landmarks make the Crown readable without blocking combat space. */
+create_object CENTER_BONFIRE {
+    number_of_objects 4
+    set_gaia_object_only
+    place_on_specific_land_id CROWN_LAND_ID
+    min_distance_group_placement 5
+    avoid_actor_area CROWN_MONUMENT_AREA
+}
+
+create_object CENTER_CRACKS {
+    number_of_objects 6
+    set_gaia_object_only
+    place_on_specific_land_id CROWN_LAND_ID
+    min_distance_group_placement 3
+    avoid_actor_area CROWN_MONUMENT_AREA
+}
+
+create_object CENTER_SKELETON {
+    number_of_objects 5
+    set_gaia_object_only
+    place_on_specific_land_id CROWN_LAND_ID
+    min_distance_group_placement 3
+    avoid_actor_area CROWN_MONUMENT_AREA
 }

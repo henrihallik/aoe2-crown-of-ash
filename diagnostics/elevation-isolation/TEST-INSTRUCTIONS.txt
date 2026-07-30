@@ -48,8 +48,12 @@ E02.
 RESULTS
 -------
 
-E01 Required Elevation Section:  SKIRMISH _____  TIME __________
-E02 Flat Player Lands:           SKIRMISH _____  TIME __________
+E01 Required Elevation Section:  SKIRMISH PASS  TIME not reported
+E02 Flat Player Lands:           SKIRMISH PASS  TIME not reported
+
+Both controls passed in the same GeForce NOW environment where V00 and V01
+crashed. This confirms the missing <ELEVATION_GENERATION> section as the shared
+runtime fault.
 
 INTERPRETATION
 --------------

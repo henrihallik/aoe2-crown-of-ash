@@ -1,0 +1,57 @@
+CROWN OF ASH v1.1.0-rc1 SMOKE TEST
+==================================
+
+PURPOSE
+-------
+
+This candidate restores every original Crown of Ash feature after correcting
+the confirmed crash cause: base_elevation was used without the required
+<ELEVATION_GENERATION> section.
+
+INSTALL
+-------
+
+Copy Crown-of-Ash-v1.1.0-rc1.rms into:
+
+%USERPROFILE%\Games\Age of Empires 2 DE\<player-id>\resources\_common\random-map-scripts\
+
+Remove or rename earlier Crown of Ash test files if the map list is ambiguous,
+then fully restart Age of Empires II: Definitive Edition. No PNG is required.
+
+TEST A: CRASH REGRESSION
+------------------------
+
+Start a single-player Skirmish with the same AI, map size, game mode, and
+Reveal Map: All Visible settings used for E01 and E02.
+
+- Scroll across the entire map.
+- Select and move the scout and villagers.
+- Move the scout to the raised center and each visible cache.
+- Let the match run for at least five minutes.
+
+Result:  SKIRMISH _____  TIME __________
+
+TEST B: COMPLETE GAMEPLAY
+-------------------------
+
+Start a new Random Map Skirmish with normal fog of war and at least one AI.
+
+- Confirm the Town Center, villagers, scout, herdables, forage, boar, deer,
+  gold, stone, and pine trees appear in each explored starting clearing.
+- Follow the guaranteed road to the raised central Crown.
+- Confirm hostile wolves, jaguars, or dire wolves guard the center.
+- Fight the wardens and capture the indestructible Monument.
+- Stop every other source of gold income, record the current amount, hold the
+  Monument for one minute, and confirm a 24-gold gain.
+- Confirm the central gold and stone piles contain 1,000 and 500 resources.
+- Find at least one hidden ash cache and confirm its mixed treasure and guard.
+- Continue playing, building, fighting, and exploring for at least ten minutes.
+
+Result:  SKIRMISH _____  TIME __________
+
+EDITOR LIMITATIONS
+------------------
+
+The Scenario Editor test mode does not apply set_gaia_unconvertible and does
+not show resource_delta changes. Use Skirmish for the warden hostility and
+enriched-mine checks.

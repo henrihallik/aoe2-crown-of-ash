@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MOD_DIR="$ROOT/Crown of Ash"
 DIST_DIR="$ROOT/dist"
-ARCHIVE="$DIST_DIR/Crown-of-Ash-v1.0.2.zip"
+ARCHIVE="$DIST_DIR/Crown-of-Ash-v1.1.0-rc1.zip"
 
 node "$ROOT/tools/validate-rms.mjs"
 mkdir -p "$DIST_DIR"

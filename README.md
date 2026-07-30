@@ -3,23 +3,26 @@
 `Crown of Ash` is a custom random map for **Age of Empires II: Definitive
 Edition**, designed by betwixtX with OpenAI Codex.
 
-**Runtime status:** v1.0.2 is a known-crashing diagnostic build. A reproducible
-crash occurs during exploration and almost immediately with the map set to All
-Visible. Terrain-isolation R01 also crashes, ruling out the flower patches as
-the sole cause. Built-in Black Forest passes under identical settings, while
-visibility tests V00 and V01 crash. V01 contains a documented semantic defect:
-it uses `base_elevation` without the required `<ELEVATION_GENERATION>` section.
-Use the
-[elevation-isolation prerelease](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/elevation-isolation-v1)
-to verify that fault before another stable version is published.
+**Runtime status:** The crash cause is confirmed. Every failed build used
+`base_elevation` without the required `<ELEVATION_GENERATION>` section. Two
+complementary controls corrected that contract in different ways, and both
+passed in the same GeForce NOW setup where the earlier files crashed.
 
-[Download historical v1.0.2](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
+Version 1.1.0-rc1 restores the complete original design on the corrected map
+structure. It is a prerelease until its restored gameplay systems complete an
+in-game smoke test.
+
+[Download the v1.1.0-rc1 standalone RMS](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.1.0-rc1/Crown-of-Ash-v1.1.0-rc1.rms)
+
+[Download the v1.1.0-rc1 local-mod ZIP](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.1.0-rc1/Crown-of-Ash-v1.1.0-rc1.zip)
 
 Each player begins in a balanced clearing inside dense pine forest. A guaranteed
-road leads from every base to a raised central Crown containing ten gold mines,
-eight stone mines, and five relics. Four unconnected side clearings contain
-randomized resource caches, rewarding scouting and deliberate forest cutting.
-In team games, allies also receive narrow rear roads.
+road leads from every base to a raised central Crown. The Crown is capturable,
+indestructible, and grants **24 gold per minute** while held. Its enriched mines
+and five relics are guarded by hostile neutral predators. Four unconnected side
+clearings contain randomized resource caches with their own guards, rewarding
+scouting and deliberate forest cutting. In team games, allies also receive
+narrow rear roads.
 
 ## Play
 
@@ -47,7 +50,8 @@ Copy the whole [`Crown of Ash`](./Crown%20of%20Ash) folder into:
 ```
 
 Or create that `Crown of Ash` folder and extract
-[`dist/Crown-of-Ash-v1.0.2.zip`](./dist/Crown-of-Ash-v1.0.2.zip) inside it.
+[`dist/Crown-of-Ash-v1.1.0-rc1.zip`](./dist/Crown-of-Ash-v1.1.0-rc1.zip) inside
+it.
 The resulting layout must begin with:
 
 ```text
@@ -68,7 +72,8 @@ and its same-named PNG into:
 %USERPROFILE%\Games\Age of Empires 2 DE\<player-id>\resources\_common\random-map-scripts\
 ```
 
-The final folders may need to be created.
+The final folders may need to be created. The PNG is only the optional map-list
+thumbnail; the RMS works without it.
 
 ## Verify
 
@@ -84,31 +89,32 @@ Build the upload-ready local-mod archive with:
 bash tools/package-mod.sh
 ```
 
-Static validation cannot execute the proprietary AoE2 DE map generator. Before
-publishing, generate several seeds for Tiny, Medium, and Large sizes in the
-in-game Scenario Editor and play one Random Map and one Regicide smoke match.
+Static validation cannot execute the proprietary AoE2 DE map generator. Follow
+the [release-candidate smoke test](./diagnostics/release-candidate/TEST-INSTRUCTIONS.txt)
+before promoting the prerelease.
 
-Version 1.0.2 removed the Monument object, guardian units, modified resource
-state, special Gaia ownership flags, animated decorations, and the Crown's
-continuously evaluated `guard_state` resource trickle. An initial GeForce NOW
-test appeared to pass, but a later test reproduced the crash when a scout moved
-toward the center; All Visible then reproduced it almost immediately. This
-invalidated the T01 and M01 feature-isolation results because both inherited
-v1.0.2.
+## Crash investigation
 
-Terrain-isolation R01 removed the `FLOWER_GROUND` patches but still crashed.
-The official Update 153015 notes identify terrain ID 122 as Grass, Flowers 1,
-so that valid modern terrain will be retained.
+The original releases crashed during exploration and almost immediately with
+Reveal Map set to All Visible. Removing the Crown, wardens, resource changes,
+decorations, and flower terrain did not stop the crash. Built-in Black Forest
+passed under the same settings with an AI opponent.
 
-Built-in Black Forest passed with All Visible and an AI opponent. Visibility
-tests V00 and V01 both crashed; V01 restores a complete starting economy and
-removes every Crown, cache, and neutral-land subsystem. Inspection then found
-that all failed builds specify `base_elevation` but omit
-`<ELEVATION_GENERATION>`. Current RMS documentation requires that section even
-when empty. Elevation tests E01 and E02 respectively add the required section
-and remove `base_elevation`, providing complementary runtime controls. This
-requirement is also documented in the
-[RMS section reference](https://docs.racket-lang.org/aoe2-rms/sections.html).
+Visibility test V01 reduced the map to complete player lands and starting
+economies, yet still crashed. It exposed the shared structural defect:
+`base_elevation` was used without an `<ELEVATION_GENERATION>` section. RMS
+documentation requires that section even when it is empty.
+
+Elevation test E01 retained `base_elevation` and added the empty section. E02
+removed `base_elevation` instead. Neither crashed. The feature-complete
+v1.1.0-rc1 therefore retains the raised player clearings and Crown while adding
+the required section. The
+[elevation-isolation release](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/elevation-isolation-v1)
+preserves the two controls and results.
+
+The Scenario Editor does not reproduce `set_gaia_unconvertible`, and it does
+not display `resource_delta` changes. Those features must be checked in
+Skirmish.
 
 ## Modern DE features
 
@@ -118,10 +124,12 @@ newer** and uses:
 - `set_circular_base` for predictable clearings
 - `generate_mode 1` for freely distributed hidden caches
 - `create_connect_land_zones 1 2` for exact player-to-center paths
-- `create_object_group` for weighted herdables and cache contents
+- `create_object_group` for weighted herdables, wardens, and cache contents
 - `avoid_other_land_zones` to keep each player's starting resources local
-- actor areas for collision-free starting resources
-- a raised central land zone as the shared control objective
+- actor areas for linked treasure and warden placement
+- `set_building_capturable` and `make_indestructible` for the Crown
+- `resource_delta` for enriched central mines
+- `guard_state` for live gold income while the Crown is controlled
 
 The RMS is self-contained and uses no custom includes, so the game can transfer
 it through a multiplayer lobby.

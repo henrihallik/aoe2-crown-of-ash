@@ -6,10 +6,12 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const rmsPath = resolve(
-  here,
-  "../Crown of Ash/resources/_common/random-map-scripts/Crown of Ash.rms",
-);
+const rmsPath = process.argv[2]
+  ? resolve(process.cwd(), process.argv[2])
+  : resolve(
+      here,
+      "../Crown of Ash/resources/_common/random-map-scripts/Crown of Ash.rms",
+    );
 const source = readFileSync(rmsPath, "utf8");
 
 function stripComments(input) {
@@ -104,14 +106,21 @@ for (const match of code.matchAll(/\b(start_random|end_random|if|elseif|else|end
 }
 assert.deepEqual(controlStack, [], "unclosed conditional or random block");
 
+const actualSections = [...code.matchAll(/<([A-Z_]+)>/g)].map((match) => match[1]);
+if (/\bbase_elevation\b/.test(code)) {
+  assert.ok(
+    actualSections.includes("ELEVATION_GENERATION"),
+    "base_elevation requires an <ELEVATION_GENERATION> section",
+  );
+}
 const expectedSections = [
   "PLAYER_SETUP",
   "LAND_GENERATION",
+  "ELEVATION_GENERATION",
   "TERRAIN_GENERATION",
   "CONNECTION_GENERATION",
   "OBJECTS_GENERATION",
 ];
-const actualSections = [...code.matchAll(/<([A-Z_]+)>/g)].map((match) => match[1]);
 assert.deepEqual(actualSections, expectedSections, "sections are missing or out of order");
 
 const constants = new Map();
@@ -120,11 +129,22 @@ for (const match of code.matchAll(/#const\s+([A-Z0-9_]+)\s+(-?\d+)/g)) {
   constants.set(match[1], Number(match[2]));
 }
 assert.ok(constants.size >= 19, "expected explicit terrain, object, and identifier aliases");
+for (const [name, value] of [
+  ["CROWN_MONUMENT", 826],
+  ["WARDEN_WOLF", 126],
+  ["WARDEN_DIRE_WOLF", 89],
+  ["WARDEN_JAGUAR", 812],
+  ["CENTER_BONFIRE", 304],
+  ["CENTER_CRACKS", 241],
+  ["CENTER_SKELETON", 710],
+]) {
+  assert.equal(constants.get(name), value, `${name} must use DE object ID ${value}`);
+}
 
 const objectGroups = blocksFor("create_object_group", code);
 assert.deepEqual(
   objectGroups.map((group) => group.name).sort(),
-  ["CACHE_TREASURE", "START_HERDABLE"],
+  ["CACHE_TREASURE", "CROWN_WARDEN", "START_HERDABLE"],
   "object group definitions changed unexpectedly",
 );
 for (const group of objectGroups) {
@@ -192,25 +212,91 @@ assert.equal(countFor("START_PINE", objects), 5, "each player needs 5 straggler 
 assert.equal(countFor("GOLD", playerScoped), 11, "each player needs 7+4 gold");
 assert.equal(countFor("STONE", playerScoped), 5, "each player needs 5 stone");
 
-for (const compatibilityRisk of [
-  "guard_state",
+assert.match(
+  code,
+  /\bguard_state\s+CROWN_MONUMENT\s+AMOUNT_GOLD\s+40\s+2\b/,
+  "the Crown must grant 24 gold per minute while controlled",
+);
+assert.equal(
+  [...code.matchAll(/\bguard_state\b/g)].length,
+  1,
+  "only one guard_state may be active",
+);
+
+const monument = objects.find((block) => block.name === "CROWN_MONUMENT");
+assert.ok(monument, "missing capturable Crown Monument");
+for (const attribute of [
+  "set_gaia_object_only",
   "set_building_capturable",
   "make_indestructible",
-  "set_gaia_unconvertible",
-  "resource_delta",
+  "ignore_terrain_restrictions",
+  "find_closest_to_map_center",
 ]) {
-  assert.doesNotMatch(
-    code,
-    new RegExp(`\\b${compatibilityRisk}\\b`),
-    `${compatibilityRisk} must remain disabled in the compatibility build`,
+  assert.match(
+    monument.body,
+    new RegExp(`\\b${attribute}\\b`),
+    `Crown Monument is missing ${attribute}`,
   );
 }
+assert.match(
+  monument.body,
+  /\bactor_area\s+CROWN_MONUMENT_AREA\b/,
+  "Crown Monument must provide its exclusion area",
+);
+
 const crownObjects = objects.filter((block) =>
   /\bplace_on_specific_land_id\s+CROWN_LAND_ID\b/.test(block.body),
 );
 assert.equal(countFor("GOLD", crownObjects), 10, "the Crown needs 10 gold mines");
 assert.equal(countFor("STONE", crownObjects), 8, "the Crown needs 8 stone mines");
 assert.equal(countFor("RELIC", crownObjects), 5, "the Crown needs 5 relics");
+
+const crownGold = crownObjects.find((block) => block.name === "GOLD");
+const crownStone = crownObjects.find((block) => block.name === "STONE");
+assert.match(
+  crownGold?.body ?? "",
+  /\bresource_delta\s+200\b/,
+  "Crown gold needs its +200 resource bonus",
+);
+assert.match(
+  crownStone?.body ?? "",
+  /\bresource_delta\s+150\b/,
+  "Crown stone needs its +150 resource bonus",
+);
+
+const wardens = objects.filter((block) => block.name === "CROWN_WARDEN");
+assert.equal(wardens.length, 2, "expected central and cache warden placements");
+for (const warden of wardens) {
+  assert.match(
+    warden.body,
+    /\bset_gaia_object_only\b[\s\S]*\bset_gaia_unconvertible\b/,
+    "set_gaia_unconvertible must follow set_gaia_object_only",
+  );
+}
+const centralWardens = wardens.find((block) =>
+  /\bactor_area_to_place_in\s+CROWN_TREASURE_AREA\b/.test(block.body),
+);
+const cacheWardens = wardens.find((block) =>
+  /\bterrain_to_place_on\s+CACHE_GROUND\b/.test(block.body),
+);
+assert.match(
+  centralWardens?.body ?? "",
+  /\bnumber_of_objects\s+7\b/,
+  "the Crown needs seven wardens",
+);
+assert.match(
+  cacheWardens?.body ?? "",
+  /\bnumber_of_objects\s+1\b[\s\S]*\bnumber_of_groups\s+4\b/,
+  "the four caches need one warden group each",
+);
+
+for (const [name, count] of [
+  ["CENTER_BONFIRE", 4],
+  ["CENTER_CRACKS", 6],
+  ["CENTER_SKELETON", 5],
+]) {
+  assert.equal(countFor(name, crownObjects), count, `unexpected ${name} count`);
+}
 
 console.log(`PASS ${rmsPath}`);
 console.log(`  ${source.split("\n").length} lines, ${source.length} bytes`);
