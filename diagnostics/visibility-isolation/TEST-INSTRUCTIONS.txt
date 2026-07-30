@@ -70,9 +70,9 @@ V08 Fixed Gold Caches
 RESULTS
 -------
 
-Built-in Black Forest:       SKIRMISH _____  TIME __________
-V00 Bare Player Starts:       SKIRMISH _____  TIME __________
-V01 Player Lands Only:       SKIRMISH _____  TIME __________
+Built-in Black Forest:       SKIRMISH PASS   TIME not recorded
+V00 Bare Player Starts:      SKIRMISH CRASH  TIME not recorded
+V01 Player Lands Only:       SKIRMISH CRASH  TIME within seconds
 V02 Empty Neutral Lands:     SKIRMISH _____  TIME __________
 V03 Crown Resources Only:    SKIRMISH _____  TIME __________
 V04 Randomized Caches Only:  SKIRMISH _____  TIME __________
@@ -80,3 +80,6 @@ V05 Crown Gold Only:         SKIRMISH _____  TIME __________
 V06 Crown Stone Only:        SKIRMISH _____  TIME __________
 V07 Crown Relics Only:       SKIRMISH _____  TIME __________
 V08 Fixed Gold Caches:       SKIRMISH _____  TIME __________
+
+V01 failed with an AI opponent and its complete starting economy. Stop this
+test series. Elevation-isolation supersedes the remaining V-tests.

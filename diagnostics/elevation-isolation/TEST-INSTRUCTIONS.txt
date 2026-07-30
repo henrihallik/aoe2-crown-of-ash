@@ -1,0 +1,69 @@
+CROWN OF ASH ELEVATION ISOLATION
+================================
+
+OBSERVED CONTROLS
+-----------------
+
+Built-in Black Forest passes with Reveal Map: All Visible and an AI opponent.
+V00 Bare Player Starts crashes.
+V01 Player Lands Only also crashes within seconds while scrolling around the
+fully visible map, despite restoring the AI's complete starting economy.
+
+V01 contains a documented RMS contract violation: its player lands specify
+base_elevation, but the script has no <ELEVATION_GENERATION> section. The RMS
+documentation says that section is required whenever any land specifies
+base_elevation, even when the section contains no create_elevation blocks.
+
+These two files correct that defect in complementary ways and make no other
+gameplay changes to V01:
+
+E01 Required Elevation Section
+    Retains base_elevation 1 and adds an empty <ELEVATION_GENERATION> section.
+
+E02 Flat Player Lands
+    Removes base_elevation 1 and does not add an elevation section.
+
+INSTALL
+-------
+
+Copy the individual E-test .rms files into:
+
+%USERPROFILE%\Games\Age of Empires 2 DE\<player-id>\resources\_common\random-map-scripts\
+
+Fully restart Age of Empires II: Definitive Edition. No PNG files are needed.
+
+TEST METHOD
+-----------
+
+Use the same single-player Skirmish settings as the failed V01 test:
+
+- the same human and AI players
+- the same map size and game mode
+- Reveal Map: All Visible
+
+Test E01 first. Scroll around the entire map, select and move units, and let the
+match run for at least three minutes before calling it PASS. Then repeat with
+E02.
+
+RESULTS
+-------
+
+E01 Required Elevation Section:  SKIRMISH _____  TIME __________
+E02 Flat Player Lands:           SKIRMISH _____  TIME __________
+
+INTERPRETATION
+--------------
+
+Both pass:
+    Confirms that base_elevation without <ELEVATION_GENERATION> caused the
+    shared V00/V01 runtime fault.
+
+E01 passes, E02 crashes:
+    The empty elevation generation stage itself is required beyond merely
+    flattening the player lands.
+
+E01 crashes, E02 passes:
+    Elevated player lands are unsafe in this map shape or current game build.
+
+Both crash:
+    Elevation was a real script defect but not the only remaining crash source.

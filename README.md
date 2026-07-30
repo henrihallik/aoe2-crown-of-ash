@@ -6,10 +6,12 @@ Edition**, designed by betwixtX with OpenAI Codex.
 **Runtime status:** v1.0.2 is a known-crashing diagnostic build. A reproducible
 crash occurs during exploration and almost immediately with the map set to All
 Visible. Terrain-isolation R01 also crashes, ruling out the flower patches as
-the sole cause. Use the
-[visibility-isolation prerelease](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/visibility-isolation-v1)
-to locate the remaining hidden-content fault before another stable version is
-published.
+the sole cause. Built-in Black Forest passes under identical settings, while
+visibility tests V00 and V01 crash. V01 contains a documented semantic defect:
+it uses `base_elevation` without the required `<ELEVATION_GENERATION>` section.
+Use the
+[elevation-isolation prerelease](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/elevation-isolation-v1)
+to verify that fault before another stable version is published.
 
 [Download historical v1.0.2](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
 
@@ -96,8 +98,17 @@ v1.0.2.
 
 Terrain-isolation R01 removed the `FLOWER_GROUND` patches but still crashed.
 The official Update 153015 notes identify terrain ID 122 as Grass, Flowers 1,
-so that valid modern terrain will be retained. The next tests independently
-remove the central resources and randomized side caches.
+so that valid modern terrain will be retained.
+
+Built-in Black Forest passed with All Visible and an AI opponent. Visibility
+tests V00 and V01 both crashed; V01 restores a complete starting economy and
+removes every Crown, cache, and neutral-land subsystem. Inspection then found
+that all failed builds specify `base_elevation` but omit
+`<ELEVATION_GENERATION>`. Current RMS documentation requires that section even
+when empty. Elevation tests E01 and E02 respectively add the required section
+and remove `base_elevation`, providing complementary runtime controls. This
+requirement is also documented in the
+[RMS section reference](https://docs.racket-lang.org/aoe2-rms/sections.html).
 
 ## Modern DE features
 
