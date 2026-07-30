@@ -1,0 +1,64 @@
+CROWN OF ASH FEATURE ISOLATION
+==============================
+
+These files are diagnostic maps, not releases. Each one starts with the stable
+v1.0.2 script and restores only the feature named in its filename.
+
+INSTALL
+-------
+
+1. Copy all .rms files from this archive into:
+
+   %USERPROFILE%\Games\Age of Empires 2 DE\<player-id>\resources\_common\random-map-scripts\
+
+2. Fully restart Age of Empires II: Definitive Edition.
+3. The diagnostic maps appear under Custom and start with "Crown Ash T".
+4. No PNG files are needed for these tests.
+
+FAST SCENARIO EDITOR TEST
+-------------------------
+
+Test T01 through T10 separately:
+
+1. Generate a new map using the named diagnostic map.
+2. Press Test.
+3. Move a unit and wait at least 30 seconds.
+4. Record PASS or CRASH below.
+
+If a test crashes, report its exact T-number and stop. If T01 through T10 all
+pass separately, test T11. T11 combines every restored feature except
+guard_state and detects a feature interaction.
+
+SKIRMISH CONFIRMATION
+---------------------
+
+For every test that passes the editor, use the same Skirmish settings that
+previously crashed v1.0.1. Let it run past 3:00 game time. Record the exact crash
+time if it fails.
+
+RESULTS
+-------
+
+T01 Static Monument:                       EDITOR _____  SKIRMISH _____
+T02 Indestructible Monument:               EDITOR _____  SKIRMISH _____
+T03 Capturable Monument:                   EDITOR _____  SKIRMISH _____
+T04 Capturable + Indestructible Monument:  EDITOR _____  SKIRMISH _____
+T05 Resource Delta:                        EDITOR _____  SKIRMISH _____
+T06 Exotic Wardens:                        EDITOR _____  SKIRMISH _____
+T07 Exotic Wardens + Gaia Flag:            EDITOR _____  SKIRMISH _____
+T08 Bonfire:                               EDITOR _____  SKIRMISH _____
+T09 Cracks + Skeletons:                    EDITOR _____  SKIRMISH _____
+T10 Guard State:                           EDITOR _____  SKIRMISH _____
+T11 All Except Guard State:                EDITOR _____  SKIRMISH _____
+
+INTERPRETATION
+--------------
+
+T01 vs T02 isolates make_indestructible.
+T01 vs T03 isolates set_building_capturable.
+T04 tests the original capture + indestructibility combination.
+T06 vs T07 isolates set_gaia_unconvertible.
+T08 isolates the animated Bonfire object.
+T09 isolates the non-animated decorative objects.
+T10 restores guard_state on the T04 Monument.
+T11 detects interactions if every individual feature passes.
