@@ -1,0 +1,82 @@
+CROWN OF ASH VISIBILITY ISOLATION
+=================================
+
+R01 still crashes with Reveal Map set to All Visible. These V-tests use R01 as
+their base and divide its remaining normally hidden content into independent
+subsystems.
+
+CONTROL TEST
+------------
+
+Before testing a V-file, run the built-in Black Forest map with exactly the same
+players, map size, game mode, and Reveal Map: All Visible setting.
+
+If built-in Black Forest also crashes, stop. That result points to the game,
+graphics session, or GeForce NOW rather than Crown of Ash.
+
+INSTALL
+-------
+
+Copy the individual V-test .rms files into:
+
+%USERPROFILE%\Games\Age of Empires 2 DE\<player-id>\resources\_common\random-map-scripts\
+
+Fully restart Age of Empires II: Definitive Edition. No PNG files are needed.
+
+TEST METHOD
+-----------
+
+Use single-player Skirmish with Reveal Map set to All Visible. Reuse the exact
+settings that crashed R01. A map that survives startup should remain running
+while units move for at least three minutes before PASS.
+
+TEST ORDER
+----------
+
+V00 Bare Player Starts
+    Player land plus Town Center, villagers, and scout only. No randomized
+    herdables, starting resources, neutral lands, or neutral objects.
+
+V01 Player Lands Only
+    Full player starts, but no Crown land, Crown resources, cache lands, cache
+    objects, or player-to-Crown connections. This restores the complete opening
+    economy over V00.
+
+V02 Empty Neutral Lands
+    Restores the Crown land, cache lands, and roads, but places no neutral
+    Crown or cache objects.
+
+If V00, V01, or V02 crashes, stop and report that V-number.
+
+V03 Crown Resources Only
+    Restores all original central gold, stone, and relics. Side caches are
+    empty.
+
+V04 Randomized Caches Only
+    Restores the original CACHE_TREASURE object group. The Crown is empty.
+
+If V03 crashes, test V05, V06, and V07:
+
+V05 Crown Gold Only
+V06 Crown Stone Only
+V07 Crown Relics Only
+
+If V04 crashes, test V08:
+
+V08 Fixed Gold Caches
+    Uses ordinary GOLD on the same cache terrain and placement pattern without
+    create_object_group. A V08 PASS isolates the randomized cache group.
+
+RESULTS
+-------
+
+Built-in Black Forest:       SKIRMISH _____  TIME __________
+V00 Bare Player Starts:       SKIRMISH _____  TIME __________
+V01 Player Lands Only:       SKIRMISH _____  TIME __________
+V02 Empty Neutral Lands:     SKIRMISH _____  TIME __________
+V03 Crown Resources Only:    SKIRMISH _____  TIME __________
+V04 Randomized Caches Only:  SKIRMISH _____  TIME __________
+V05 Crown Gold Only:         SKIRMISH _____  TIME __________
+V06 Crown Stone Only:        SKIRMISH _____  TIME __________
+V07 Crown Relics Only:       SKIRMISH _____  TIME __________
+V08 Fixed Gold Caches:       SKIRMISH _____  TIME __________

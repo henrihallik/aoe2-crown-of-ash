@@ -5,9 +5,11 @@ Edition**, designed by betwixtX with OpenAI Codex.
 
 **Runtime status:** v1.0.2 is a known-crashing diagnostic build. A reproducible
 crash occurs during exploration and almost immediately with the map set to All
-Visible. Use the
-[terrain-isolation prerelease](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/terrain-isolation-v1)
-to test the suspected unused terrain ID before another stable version is published.
+Visible. Terrain-isolation R01 also crashes, ruling out the flower patches as
+the sole cause. Use the
+[visibility-isolation prerelease](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/visibility-isolation-v1)
+to locate the remaining hidden-content fault before another stable version is
+published.
 
 [Download historical v1.0.2](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
 
@@ -92,9 +94,10 @@ toward the center; All Visible then reproduced it almost immediately. This
 invalidated the T01 and M01 feature-isolation results because both inherited
 v1.0.2.
 
-The retained `FLOWER_GROUND` alias points to terrain ID 122, which current DE
-terrain references mark unused. It generates patches just beyond the starting
-sight radius and is the next controlled runtime test.
+Terrain-isolation R01 removed the `FLOWER_GROUND` patches but still crashed.
+The official Update 153015 notes identify terrain ID 122 as Grass, Flowers 1,
+so that valid modern terrain will be retained. The next tests independently
+remove the central resources and randomized side caches.
 
 ## Modern DE features
 

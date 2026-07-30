@@ -1,6 +1,12 @@
 CROWN OF ASH TERRAIN 122 ISOLATION
 ==================================
 
+COMPLETED: R01 CRASHED. TERRAIN 122 IS NOT THE SOLE CAUSE.
+
+The official Update 153015 notes identify terrain 122 as Grass, Flowers 1. The
+earlier third-party table that marked it unused was stale. These files are kept
+only to preserve the diagnostic history. Continue with visibility-isolation.
+
 WHY THESE TESTS EXIST
 ---------------------
 
@@ -9,13 +15,12 @@ toward the center. It crashes almost immediately in Skirmish when Reveal Map is
 set to All Visible. T01 and M01 inherited v1.0.2, so their failures do not prove
 that either added building caused the crash.
 
-The v1.0.2 audit found one invalid-looking retained feature:
+The initial v1.0.2 audit questioned this retained feature:
 
     #const FLOWER_GROUND 122
 
-Current DE terrain references mark ID 122 as unused. The map generates three
-patches of it outside each player's initial sight radius. Revealing such a patch
-fits the observed movement-dependent crash.
+The map generates three patches outside each player's initial sight radius.
+R01 later proved that removing those patches does not prevent the crash.
 
 INSTALL
 -------
