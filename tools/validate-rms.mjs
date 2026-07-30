@@ -192,10 +192,10 @@ assert.equal(countFor("START_PINE", objects), 5, "each player needs 5 straggler 
 assert.equal(countFor("GOLD", playerScoped), 11, "each player needs 7+4 gold");
 assert.equal(countFor("STONE", playerScoped), 5, "each player needs 5 stone");
 
-assert.match(
+assert.doesNotMatch(
   code,
-  /\bguard_state\s+CROWN_MONUMENT\s+AMOUNT_GOLD\s+40\s+2\b/,
-  "the Crown gold trickle changed unexpectedly",
+  /\bguard_state\b/,
+  "guard_state is the isolated post-start crash suspect and must remain disabled",
 );
 assert.ok(
   objects.some(
