@@ -1,0 +1,70 @@
+CROWN OF ASH TERRAIN 122 ISOLATION
+==================================
+
+WHY THESE TESTS EXIST
+---------------------
+
+The unchanged v1.0.2 map crashes when a scout moves from the starting area
+toward the center. It crashes almost immediately in Skirmish when Reveal Map is
+set to All Visible. T01 and M01 inherited v1.0.2, so their failures do not prove
+that either added building caused the crash.
+
+The v1.0.2 audit found one invalid-looking retained feature:
+
+    #const FLOWER_GROUND 122
+
+Current DE terrain references mark ID 122 as unused. The map generates three
+patches of it outside each player's initial sight radius. Revealing such a patch
+fits the observed movement-dependent crash.
+
+INSTALL
+-------
+
+Copy the individual R-test .rms files into:
+
+%USERPROFILE%\Games\Age of Empires 2 DE\<player-id>\resources\_common\random-map-scripts\
+
+Fully restart Age of Empires II: Definitive Edition. No PNG files are needed.
+
+TEST ORDER
+----------
+
+Fastest test:
+
+1. Start a single-player Skirmish with Reveal Map set to All Visible.
+2. Select R01 and otherwise reuse the settings that instantly crashed v1.0.2.
+3. Move units and let the match run for at least three minutes before PASS.
+4. Repeat with R02.
+
+Scenario Editor confirmation:
+
+Generate the named map and press Test. Type the "marco" reveal-map cheat if it
+works in Editor test mode. Otherwise move the scout out of the starting clearing
+along the road, reach the center, and continue for at least three minutes.
+
+R01 No Unused Terrain 122
+    Exactly v1.0.2 with only the FLOWER_GROUND constant and create_terrain block
+    removed. Test this first.
+
+R02 Valid Savannah Patches
+    Exactly v1.0.2 with the same create_terrain block, but terrain ID 41
+    (Savannah) replaces unused ID 122.
+
+INTERPRETATION
+--------------
+
+R01 PASS + R02 PASS
+    Terrain ID 122 caused the crash. The patch feature is safe with a valid ID.
+
+R01 PASS + R02 CRASH
+    The create_terrain patch operation, rather than ID 122 alone, is unsafe.
+
+R01 CRASH
+    Terrain 122 is not the only cause. Stop and report where the scout was when
+    it crashed; the next split will remove the complete Crown hub.
+
+RESULTS
+-------
+
+R01 No Unused Terrain 122:    EDITOR _____  SKIRMISH _____  TIME __________
+R02 Valid Savannah Patches:   EDITOR _____  SKIRMISH _____  TIME __________

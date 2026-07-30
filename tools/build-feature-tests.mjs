@@ -37,7 +37,7 @@ const monumentInstructionsPath = join(
 );
 
 const baseline = readFileSync(baselinePath, "utf8");
-assert.match(baseline, /Crown of Ash v1\.0\.2/, "diagnostics require the stable v1.0.2 baseline");
+assert.match(baseline, /Crown of Ash v1\.0\.2/, "diagnostics require the v1.0.2 baseline");
 
 const ALIAS_MARKER = "/* Stable identifiers used by placement constraints. */";
 const PLAYER_SETUP_MARKER = "ai_info_map_type BLACK_FOREST 0 0 0\n";
@@ -257,7 +257,7 @@ function diagnosticHeader(source, id, title) {
     "/* Compatibility: Definitive Edition */\n",
     `/*
     DIAGNOSTIC VARIANT ONLY.
-    Stable base: v1.0.2.
+    Known-crashing base: v1.0.2.
     Restored feature: ${title}.
 */\n`,
   );

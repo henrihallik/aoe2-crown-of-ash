@@ -1,8 +1,15 @@
 CROWN OF ASH FEATURE ISOLATION
 ==============================
 
-These files are diagnostic maps, not releases. Each one starts with the stable
-v1.0.2 script and restores only the feature named in its filename.
+OBSOLETE: DO NOT USE THESE RESULTS FOR FEATURE ISOLATION.
+
+Every file starts with v1.0.2, which was later confirmed to crash when a scout
+reveals terrain outside the starting area. A T-test crash can therefore come
+from the shared baseline rather than the restored feature. Use the newer
+terrain-isolation tests first.
+
+These files are diagnostic maps, not releases. Each one starts with the v1.0.2
+script and restores only the feature named in its filename.
 
 INSTALL
 -------

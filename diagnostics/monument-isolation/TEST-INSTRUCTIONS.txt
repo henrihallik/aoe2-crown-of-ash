@@ -1,9 +1,12 @@
 CROWN OF ASH MONUMENT ISOLATION
 ================================
 
-T01 proved that restoring only the passive Monument placement crashes the
-current AoE2 DE runtime. These M-tests split that placement into individual
-variables and test an Outpost replacement.
+OBSOLETE: DO NOT USE THESE RESULTS TO BLAME THE MONUMENT.
+
+After T01 and M01 failed, the unchanged v1.0.2 baseline was also confirmed to
+crash when a scout approached the center. Both tests inherited that fault, so
+neither result isolates its added building. Use the newer terrain-isolation
+tests first.
 
 INSTALL
 -------

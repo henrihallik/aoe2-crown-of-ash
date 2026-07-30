@@ -3,7 +3,13 @@
 `Crown of Ash` is a custom random map for **Age of Empires II: Definitive
 Edition**, designed by betwixtX with OpenAI Codex.
 
-[Download Crown of Ash v1.0.2](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
+**Runtime status:** v1.0.2 is a known-crashing diagnostic build. A reproducible
+crash occurs during exploration and almost immediately with the map set to All
+Visible. Use the
+[terrain-isolation prerelease](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/terrain-isolation-v1)
+to test the suspected unused terrain ID before another stable version is published.
+
+[Download historical v1.0.2](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
 
 Each player begins in a balanced clearing inside dense pine forest. A guaranteed
 road leads from every base to a raised central Crown containing ten gold mines,
@@ -78,13 +84,17 @@ Static validation cannot execute the proprietary AoE2 DE map generator. Before
 publishing, generate several seeds for Tiny, Medium, and Large sizes in the
 in-game Scenario Editor and play one Random Map and one Regicide smoke match.
 
-Version 1.0.2 is the runtime-compatible release made after crashes in Skirmish
-and Scenario Editor test mode. It removes the Monument object, all guardian
-units, modified resource state, special Gaia ownership flags, and animated
-decorations. Version 1.0.1 had already removed the Crown's continuously evaluated
-`guard_state` resource trickle. The generated layout and standard central
-treasure remain intact. An in-engine GeForce NOW test no longer reproduced the
-previous crash.
+Version 1.0.2 removed the Monument object, guardian units, modified resource
+state, special Gaia ownership flags, animated decorations, and the Crown's
+continuously evaluated `guard_state` resource trickle. An initial GeForce NOW
+test appeared to pass, but a later test reproduced the crash when a scout moved
+toward the center; All Visible then reproduced it almost immediately. This
+invalidated the T01 and M01 feature-isolation results because both inherited
+v1.0.2.
+
+The retained `FLOWER_GROUND` alias points to terrain ID 122, which current DE
+terrain references mark unused. It generates patches just beyond the starting
+sight radius and is the next controlled runtime test.
 
 ## Modern DE features
 
