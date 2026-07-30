@@ -3,14 +3,13 @@
 `Crown of Ash` is a custom random map for **Age of Empires II: Definitive
 Edition**, designed by betwixtX with OpenAI Codex.
 
-[Download Crown of Ash v1.0.1](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.1/Crown-of-Ash-v1.0.1.zip)
+[Download Crown of Ash v1.0.2 compatibility build](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.0.2/Crown-of-Ash-v1.0.2.zip)
 
 Each player begins in a balanced clearing inside dense pine forest. A guaranteed
-road leads from every base to a raised central Crown. The Crown is capturable,
-indestructible, and marks a rich central prize: ten gold mines, eight stone
-mines, and five relics guarded by hostile neutral predators. Four unconnected
-side clearings contain randomized resource caches, rewarding scouting and
-deliberate forest cutting. In team games, allies also receive narrow rear roads.
+road leads from every base to a raised central Crown containing ten gold mines,
+eight stone mines, and five relics. Four unconnected side clearings contain
+randomized resource caches, rewarding scouting and deliberate forest cutting.
+In team games, allies also receive narrow rear roads.
 
 ## Play
 
@@ -38,7 +37,7 @@ Copy the whole [`Crown of Ash`](./Crown%20of%20Ash) folder into:
 ```
 
 Or create that `Crown of Ash` folder and extract
-[`dist/Crown-of-Ash-v1.0.1.zip`](./dist/Crown-of-Ash-v1.0.1.zip) inside it.
+[`dist/Crown-of-Ash-v1.0.2.zip`](./dist/Crown-of-Ash-v1.0.2.zip) inside it.
 The resulting layout must begin with:
 
 ```text
@@ -79,9 +78,12 @@ Static validation cannot execute the proprietary AoE2 DE map generator. Before
 publishing, generate several seeds for Tiny, Medium, and Large sizes in the
 in-game Scenario Editor and play one Random Map and one Regicide smoke match.
 
-Version 1.0.1 removes the Crown's continuously evaluated `guard_state` resource
-trickle after an in-game crash was observed shortly after match startup. The
-center's static treasure and capturable Monument remain intact.
+Version 1.0.2 is a conservative compatibility build made after crashes in
+Skirmish and Scenario Editor test mode. It removes the Monument object, all
+guardian units, modified resource state, special Gaia ownership flags, and
+animated decorations. Version 1.0.1 had already removed the Crown's continuously
+evaluated `guard_state` resource trickle. The generated layout and standard
+central treasure remain intact.
 
 ## Modern DE features
 
@@ -91,10 +93,10 @@ newer** and uses:
 - `set_circular_base` for predictable clearings
 - `generate_mode 1` for freely distributed hidden caches
 - `create_connect_land_zones 1 2` for exact player-to-center paths
-- `create_object_group` for weighted herdables, guardians, and cache contents
+- `create_object_group` for weighted herdables and cache contents
 - `avoid_other_land_zones` to keep each player's starting resources local
-- actor areas for linked treasure/guardian placement
-- a capturable, indestructible Monument as the central control marker
+- actor areas for collision-free starting resources
+- a raised central land zone as the shared control objective
 
 The RMS is self-contained and uses no custom includes, so the game can transfer
 it through a multiplayer lobby.

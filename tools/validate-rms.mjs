@@ -119,12 +119,12 @@ for (const match of code.matchAll(/#const\s+([A-Z0-9_]+)\s+(-?\d+)/g)) {
   assert.ok(!constants.has(match[1]), `duplicate custom constant ${match[1]}`);
   constants.set(match[1], Number(match[2]));
 }
-assert.ok(constants.size >= 20, "expected explicit terrain, object, and identifier aliases");
+assert.ok(constants.size >= 19, "expected explicit terrain, object, and identifier aliases");
 
 const objectGroups = blocksFor("create_object_group", code);
 assert.deepEqual(
   objectGroups.map((group) => group.name).sort(),
-  ["CACHE_TREASURE", "CROWN_WARDEN", "START_HERDABLE"],
+  ["CACHE_TREASURE", "START_HERDABLE"],
   "object group definitions changed unexpectedly",
 );
 for (const group of objectGroups) {
@@ -192,28 +192,25 @@ assert.equal(countFor("START_PINE", objects), 5, "each player needs 5 straggler 
 assert.equal(countFor("GOLD", playerScoped), 11, "each player needs 7+4 gold");
 assert.equal(countFor("STONE", playerScoped), 5, "each player needs 5 stone");
 
-assert.doesNotMatch(
-  code,
-  /\bguard_state\b/,
-  "guard_state is the isolated post-start crash suspect and must remain disabled",
+for (const compatibilityRisk of [
+  "guard_state",
+  "set_building_capturable",
+  "make_indestructible",
+  "set_gaia_unconvertible",
+  "resource_delta",
+]) {
+  assert.doesNotMatch(
+    code,
+    new RegExp(`\\b${compatibilityRisk}\\b`),
+    `${compatibilityRisk} must remain disabled in the compatibility build`,
+  );
+}
+const crownObjects = objects.filter((block) =>
+  /\bplace_on_specific_land_id\s+CROWN_LAND_ID\b/.test(block.body),
 );
-assert.ok(
-  objects.some(
-    (block) =>
-      block.name === "CROWN_MONUMENT" &&
-      /\bset_building_capturable\b/.test(block.body) &&
-      /\bmake_indestructible\b/.test(block.body),
-  ),
-  "the Crown must remain capturable and indestructible",
-);
-assert.ok(
-  objects.filter(
-    (block) =>
-      block.name === "CROWN_WARDEN" &&
-      /\bset_gaia_unconvertible\b/.test(block.body),
-  ).length >= 2,
-  "central and cache wardens must be hostile",
-);
+assert.equal(countFor("GOLD", crownObjects), 10, "the Crown needs 10 gold mines");
+assert.equal(countFor("STONE", crownObjects), 8, "the Crown needs 8 stone mines");
+assert.equal(countFor("RELIC", crownObjects), 5, "the Crown needs 5 relics");
 
 console.log(`PASS ${rmsPath}`);
 console.log(`  ${source.split("\n").length} lines, ${source.length} bytes`);
