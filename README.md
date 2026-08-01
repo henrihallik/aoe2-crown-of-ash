@@ -3,18 +3,17 @@
 `Crown of Ash` is a custom random map for **Age of Empires II: Definitive
 Edition**, designed by betwixtX with OpenAI Codex.
 
-**Runtime status:** The crash cause is confirmed. Every failed build used
+**Runtime status:** Stable. Every failed diagnostic build used
 `base_elevation` without the required `<ELEVATION_GENERATION>` section. Two
 complementary controls corrected that contract in different ways, and both
 passed in the same GeForce NOW setup where the earlier files crashed.
 
-Version 1.1.0-rc1 restores the complete original design on the corrected map
-structure. It is a prerelease until its restored gameplay systems complete an
-in-game smoke test.
+Version 1.1.0 restores the complete original design on the corrected map
+structure. The restored build was subsequently confirmed working in Skirmish.
 
-[Download the v1.1.0-rc1 standalone RMS](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.1.0-rc1/Crown-of-Ash-v1.1.0-rc1.rms)
+[Download the v1.1.0 standalone RMS](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.1.0/Crown-of-Ash-v1.1.0.rms)
 
-[Download the v1.1.0-rc1 local-mod ZIP](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.1.0-rc1/Crown-of-Ash-v1.1.0-rc1.zip)
+[Download the v1.1.0 local-mod ZIP](https://github.com/henrihallik/aoe2-crown-of-ash/releases/download/v1.1.0/Crown-of-Ash-v1.1.0.zip)
 
 Each player begins in a balanced clearing inside dense pine forest. A guaranteed
 road leads from every base to a raised central Crown. The Crown is capturable,
@@ -50,7 +49,7 @@ Copy the whole [`Crown of Ash`](./Crown%20of%20Ash) folder into:
 ```
 
 Or create that `Crown of Ash` folder and extract
-[`dist/Crown-of-Ash-v1.1.0-rc1.zip`](./dist/Crown-of-Ash-v1.1.0-rc1.zip) inside
+[`dist/Crown-of-Ash-v1.1.0.zip`](./dist/Crown-of-Ash-v1.1.0.zip) inside
 it.
 The resulting layout must begin with:
 
@@ -89,9 +88,9 @@ Build the upload-ready local-mod archive with:
 bash tools/package-mod.sh
 ```
 
-Static validation cannot execute the proprietary AoE2 DE map generator. Follow
-the [release-candidate smoke test](./diagnostics/release-candidate/TEST-INSTRUCTIONS.txt)
-before promoting the prerelease.
+Static validation cannot execute the proprietary AoE2 DE map generator. The
+[smoke-test checklist](./diagnostics/release-candidate/TEST-INSTRUCTIONS.txt)
+documents the runtime checks used for release validation.
 
 ## Crash investigation
 
@@ -107,7 +106,7 @@ documentation requires that section even when it is empty.
 
 Elevation test E01 retained `base_elevation` and added the empty section. E02
 removed `base_elevation` instead. Neither crashed. The feature-complete
-v1.1.0-rc1 therefore retains the raised player clearings and Crown while adding
+v1.1.0 therefore retains the raised player clearings and Crown while adding
 the required section. The
 [elevation-isolation release](https://github.com/henrihallik/aoe2-crown-of-ash/releases/tag/elevation-isolation-v1)
 preserves the two controls and results.
